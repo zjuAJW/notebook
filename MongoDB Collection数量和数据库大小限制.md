@@ -5,15 +5,15 @@
 对于Mongo3.4，默认的存储引擎是**WiredTiger**，对Collecion的数量没有限制。  
 而对于Mongo3.2以前的版本，默认存储引擎是**MMAPv1**，官方文档的说法是
 
-	For the MMAPv1 the number of namespaces is limited to the size of the namespace file divided by 628
+>For the MMAPv1 the number of namespaces is limited to the size of the namespace file divided by 628
 	
-	A 16 megabyte namespace file can support approximately 24,000 namespaces. Each collection and index is a namespace.
+>A 16 megabyte namespace file can support approximately 24,000 namespaces. Each collection and index is a namespace.
 
 Namespece File在官方文档中也有说明
 
-	For the MMAPv1 storage engine, namespace files can be no larger than 2047 megabytes.
+>For the MMAPv1 storage engine, namespace files can be no larger than 2047 megabytes.
 
-	By default namespace files are 16 megabytes. You can configure the size using the nsSize option.
+>By default namespace files are 16 megabytes. You can configure the size using the nsSize option.
 
 同样的，**WiredTiger**引擎也不受这个限制。 
 
@@ -21,9 +21,9 @@ Namespece File在官方文档中也有说明
 ##数据库大小
 在官方文档上找到了关于**MMAPv1**的数据库大小的限制,最大32TB，但是没有找到关于**WiredTiger**的
 
-	The MMAPv1 storage engine limits each database to no more than 16000 data files. 
-	This means that a single MMAPv1 database has a maximum size of 32TB. 
-	Setting the storage.mmapv1.smallFiles option reduces this limit to 8TB.
+>The MMAPv1 storage engine limits each database to no more than 16000 data files.   
+>This means that a single MMAPv1 database has a maximum size of 32TB.   
+>Setting the storage.mmapv1.smallFiles option reduces this limit to 8TB.
 #
 #
 ##操作系统的限制
@@ -38,7 +38,7 @@ Namespece File在官方文档中也有说明
 			"codeName" : "UnknownError"
 		}
 
-Too many open files是什么鬼？网上查了一下啊，貌似跟Linux系统本身的限制有关。mongo也提供了[相关的文档](https://docs.mongodb.com/manual/reference/ulimit/)  
+**Too many open files**是什么鬼？网上查了一下啊，貌似跟Linux系统本身的限制有关。mongo也提供了[相关的文档](https://docs.mongodb.com/manual/reference/ulimit/)  
 大体来说，就是Linux本身对某个进程或者某个用户占用的系统资源进行了限制，当然也就包括对mongo的限制。所以我们需要更改Linux的设置，来让mongo能够使用足够多的系统资源。  
 Linux常见的一些限制如下（这是公司测试机的一些情况）：
 
@@ -69,5 +69,5 @@ mongo的建议配置：
 	-m (memory size): unlimited
 	-u (processes/threads): 64000
 
-
-
+但是，如果按照之前的需求，貌似要有百万数量级的collection，有点多，所以还是把数据存到一个collection中吧。  
+所以下面测试一下单个collecton在插入数据到很大数量时，速度会不会有明显的变化。  
