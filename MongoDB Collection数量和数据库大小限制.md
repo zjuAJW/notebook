@@ -24,6 +24,7 @@ Namespece File在官方文档中也有说明
 >The MMAPv1 storage engine limits each database to no more than 16000 data files.   
 >This means that a single MMAPv1 database has a maximum size of 32TB.   
 >Setting the storage.mmapv1.smallFiles option reduces this limit to 8TB.
+
 #
 #
 ##操作系统的限制
