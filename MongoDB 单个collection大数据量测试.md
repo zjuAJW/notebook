@@ -42,5 +42,18 @@ StackOverflow上有在导入比较大的数据文件时[无法连接的问题](h
 >
 >mongoimport -d mietscraping -c mails -j 4 < mails.json
 
-可以尝试一下。  
+但是试了一下好像没什么作用。
+
+
+根据上面的报错，soecket exception， 感觉是连接或者网络上的问题，难道是连接数满了？mongoimport之后没有释放连接？  
+但是看了一下，import之后，连接的状态都是TIME_WAIT,所以连接是关闭了的。  
+
+![TIME_WAIT状态](https://github.com/zjuAJW/MarkdownPhoto/blob/master/TIME_WAIT.PNG?raw=true)
+
+但是TIME\_WAIT的连接也是要占用连接数的啊，之前看过，ulimit -n 最大的open files 限制是1024，难道是这里超了？
+做了一下实验，发现当我连接数（包括TIME\_WAIT状态的）远超1024的时候，竟然还能建立连接插入数据！！难道我理解错了这个1024的意义？手动捂脸。。。。。。  
+
+>**小tips**:mongo的配置文件里有net.maxIncomingConnections选项来限制mongo的可用连接数，但注意，这个连接数会有一个封顶值，就是系统open files 的80%，如果你设置的值大于这个值的话，是没有用的。
+
+  
 另外，丢失数据的情况还是在比较靠后的时候才发生的，但是内存占用还没达到峰值，本来怀疑是mongo的内存用满导致了什么问题，这样看来也不能确定。
