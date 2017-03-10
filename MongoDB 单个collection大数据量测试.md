@@ -53,7 +53,23 @@ StackOverflow上有在导入比较大的数据文件时[无法连接的问题](h
 但是TIME\_WAIT的连接也是要占用连接数的啊，之前看过，ulimit -n 最大的open files 限制是1024，难道是这里超了？
 做了一下实验，发现当我连接数（包括TIME\_WAIT状态的）远超1024的时候，竟然还能建立连接插入数据！！难道我理解错了这个1024的意义？手动捂脸。。。。。。  
 
->**小tips**:mongo的配置文件里有net.maxIncomingConnections选项来限制mongo的可用连接数，但注意，这个连接数会有一个封顶值，就是系统open files 的80%，如果你设置的值大于这个值的话，是没有用的。
+>**小tips**:mongo的配置文件里有net.maxIncomingConnections选项来限制mongo的可用连接数，但注意，这个连接数会有一个封顶值，就是系统open files 的80%，如果你设置的值大于这个值的话，是没有用的。  
 
+既然这样，那我就建立很多连接但是先不断开，看报的错误是否和之前是一样的。  
+当所建连接数大于mongo本身的连接数（maxIncomingConnections）时，会报错
+
+	2017-03-09T22:18:29.084+0800 I NETWORK  [thread1] connection refused because too many open connections: 819
+
+当所建连接数大于open files的限制时（这里由于collecton也要占用文件句柄，所以，建立的连接数其实是少于这个限制的），会报错：
+![too many open files](https://github.com/zjuAJW/MarkdownPhoto/blob/master/too%20many%20open%20files.PNG?raw=true)
   
+
+所以二者的报错都和之前的错误是不一样的，感觉并不是连接的问题。  
+
+感觉还是内存的问题，内存使用增长到40%左右就变了想想就感觉很奇怪啊！！40%这个数跟官方的说法对不上！
+
+
+
+
+
 另外，丢失数据的情况还是在比较靠后的时候才发生的，但是内存占用还没达到峰值，本来怀疑是mongo的内存用满导致了什么问题，这样看来也不能确定。
